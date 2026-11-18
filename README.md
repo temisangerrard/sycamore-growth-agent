@@ -1,4 +1,4 @@
-# Sikamo UK research workspace
+# Sycamore UK research workspace
 
 The active implementation is a local loan-acquisition research and manual-outreach workspace. Run `node prototype/server.mjs`, then open http://127.0.0.1:4317. See [runtime and provider setup](prototype/RUNNING.md). The product questions panel supersedes assumptions in the historical starter brief below.
 

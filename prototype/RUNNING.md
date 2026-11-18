@@ -1,4 +1,4 @@
-# Run Sikamo UK research workspace
+# Run Sycamore UK research workspace
 
 Requires Node 22+ and, for optional synthesis, a signed-in `codex` CLI.
 
