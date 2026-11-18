@@ -12,4 +12,4 @@ jobs:
           node-version: 22
       - run: node --check prototype/app.js
       - run: node --check prototype/server.mjs
-      - run: node --test prototype/*.test.mjs
+      - run: node --test prototype/*.test.mjs cloudflare/*.test.mjs

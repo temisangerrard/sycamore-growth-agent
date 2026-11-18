@@ -1,0 +1,4 @@
+import {mkdir,copyFile,readFile,writeFile} from 'node:fs/promises';
+await mkdir(new URL('./public/',import.meta.url),{recursive:true});
+for(const name of ['index.html','app.js','style.css'])await copyFile(new URL('../prototype/'+name,import.meta.url),new URL('./public/'+name,import.meta.url));
+const page=new URL('./public/index.html',import.meta.url);let html=await readFile(page,'utf8');html=html.replace('Treg → Exa discovery → Firecrawl page checks','Hosted pipeline · saved Treg / Exa / Firecrawl evidence').replace('<form id="ask">','<p class="muted">Run new research in the local Codex workspace. This hosted version supports saved evidence, pipeline review, drafts and exports.</p><form id="ask" hidden>');html=html.replace('Default research','Local research');await writeFile(page,html);
