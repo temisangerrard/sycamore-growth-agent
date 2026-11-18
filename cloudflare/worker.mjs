@@ -1,12 +1,9 @@
-import {createHash,timingSafeEqual} from 'node:crypto';
 import {saveRecord,deleteRecord} from '../prototype/records.mjs';
 const json=(data,status=200)=>new Response(JSON.stringify(data),{status,headers:{'content-type':'application/json','cache-control':'no-store','x-content-type-options':'nosniff'}});
-function authenticated(req,env){try{const [scheme,encoded]=req.headers.get('authorization').split(' ');if(scheme!=='Basic')return false;const credentials=atob(encoded);const colon=credentials.indexOf(':');if(credentials.slice(0,colon)!=='sycamore')return false;const hash=createHash('sha256').update(credentials.slice(colon+1)).digest('hex');return env.ACCESS_PASSWORD_HASH?.length===64&&timingSafeEqual(Buffer.from(hash),Buffer.from(env.ACCESS_PASSWORD_HASH));}catch{return false;}}
 async function readState(db){const row=await db.prepare('SELECT version,document FROM workspace WHERE id=1').first();if(!row)throw Error('Storage not initialized');return {version:row.version,state:JSON.parse(row.document)};}
 async function mutate(db,fn){for(let attempt=0;attempt<8;attempt++){const {version,state}=await readState(db);const value=fn(state);const result=await db.prepare('UPDATE workspace SET document=?,version=version+1 WHERE id=1 AND version=?').bind(JSON.stringify(state),version).run();if(result.meta.changes===1)return value;}throw Error('Concurrent update; please try again');}
 const quote=value=>'"'+(/^\s*[=+@\-]/.test(String(value??''))?"'":'')+String(value??'').replaceAll('"','""')+'"';
 export default {async fetch(req,env){
- if(!authenticated(req,env))return new Response('Sign in to Sycamore research',{status:401,headers:{'www-authenticate':'Basic realm="Sycamore research", charset="UTF-8"','cache-control':'no-store'}});
  const url=new URL(req.url);
  if(!url.pathname.startsWith('/api/')){const res=await env.ASSETS.fetch(req);const headers=new Headers(res.headers);headers.set('cache-control','private, no-store');headers.set('x-content-type-options','nosniff');headers.set('referrer-policy','same-origin');return new Response(res.body,{status:res.status,headers});}
  try{
