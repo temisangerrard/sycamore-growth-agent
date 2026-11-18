@@ -9,7 +9,7 @@ import { resolve } from 'node:path';
 
 const run = promisify(execFile);
 const port = Number(process.env.SYCAMORE_PORT || 4317);
-const files = { '/': ['index.html', 'text/html'], '/app.js': ['app.js', 'text/javascript'], '/style.css': ['style.css', 'text/css'], '/seed.json': ['seed.json', 'application/json'] };
+const files = { '/': ['index.html', 'text/html'], '/app.js': ['app.js', 'text/javascript'], '/contacts.mjs': ['contacts.mjs','text/javascript'], '/style.css': ['style.css', 'text/css'], '/seed.json': ['seed.json', 'application/json'] };
 let firecrawlKey = process.env.FIRECRAWL_API_KEY || '';
 let busy = false;
 const store = await openStore(process.env.SYCAMORE_DATA || fileURLToPath(new URL('./data/records.json', import.meta.url)));
@@ -111,7 +111,7 @@ const server = createServer(async (req, res) => {
     try {return json(res,200,JSON.parse(await readFile(new URL('./data/treg-research.json',import.meta.url),'utf8')));} catch{return json(res,200,null);}
   }
   if (req.method === 'GET' && req.url === '/api/export.csv') {
-    const rows=await store.list(); const columns=['name','type','area','segment','source','evidence','contact','status','confidence','priority','unknowns','next','owner','notes','followUp','provenance','suppressed','discoveredAt'];
+    const rows=await store.list(); const columns=['name','company','role','phone','email','product','contactKind','checkedAt','type','area','segment','source','evidence','contact','status','confidence','priority','unknowns','next','owner','notes','followUp','provenance','suppressed','discoveredAt'];
     const quote=value=>'"'+(/^\s*[=+@\-]/.test(String(value??''))?"'":'')+String(value??'').replaceAll('"','""')+'"';
     res.writeHead(200,{'content-type':'text/csv; charset=utf-8','content-disposition':'attachment; filename="sycamore-pipeline.csv"','cache-control':'no-store'}).end('\uFEFF'+[columns.map(quote).join(','),...rows.map(r=>columns.map(k=>quote(r[k])).join(','))].join('\r\n')); return;
   }
