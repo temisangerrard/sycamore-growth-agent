@@ -1,0 +1,9 @@
+prototype/data/
+.env
+.env.*
+node_modules/
+work/
+.DS_Store
+.wrangler/
+cloudflare/public/
+cloudflare/.dev.vars
