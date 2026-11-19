@@ -1,4 +1,4 @@
-import {contactRows,contactCsv} from '/contacts.mjs';
+import {contactRows,contactCsv,isProfileContact} from '/contacts.mjs';
 const $=id=>document.getElementById(id);
 const stages=['Researched','Reviewed','Contacted','Replied','Interested','Application started','Outcome'];
 let records=[],selected=null;
@@ -61,7 +61,7 @@ function renderCalls(){
  const body=$('call-rows');body.replaceChildren();
  for(const r of rows){
   const tr=el('tr'),person=el('td'),name=el('button',r.name);name.className='lead';name.onclick=()=>open(r);person.append(name,el('small',[r.role,r.company,r.area].filter(Boolean).join(' · ')));
-  const contact=el('td');if(r.phone){const a=el('a',r.phone);a.href='tel:'+r.phone.replace(/[^+0-9]/g,'');contact.append(a,el('br'));}if(r.email){const a=el('a',r.email);if(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(r.email))a.href='mailto:'+r.email;contact.append(a);}if(r.contactKind==='Public profile'&&/^https:\/\/(?:www\.)?(?:x\.com|linkedin\.com)\//i.test(r.contact)){const a=el('a','Open profile ↗');a.href=r.contact;a.target='_blank';a.rel='noopener noreferrer';contact.append(a,el('small','Public profile · phone/email unverified'));}else contact.append(el('small',r.contactKind));
+  const contact=el('td');if(r.phone){const a=el('a',r.phone);a.href='tel:'+r.phone.replace(/[^+0-9]/g,'');contact.append(a,el('br'));}if(r.email){const a=el('a',r.email);if(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(r.email))a.href='mailto:'+r.email;contact.append(a);}if(r.contactKind==='Public profile'&&isProfileContact(r.contact)){const a=el('a','Open profile ↗');a.href=r.contact;a.target='_blank';a.rel='noopener noreferrer';contact.append(a,el('small','Public profile · phone/email unverified'));}else contact.append(el('small',r.contactKind));
   const pitch=el('td');pitch.append(el('strong',r.product||'Loans or investments'),el('small',r.segment),el('p',r.relevance));const details=el('details'),summary=el('summary','What to say');details.append(summary,el('p',r.draft));pitch.append(details);const source=el('a','Contact source ↗');if(/^https?:\/\//.test(r.source))source.href=r.source;source.target='_blank';source.rel='noopener noreferrer';pitch.append(source,el('small','Checked '+r.checkedAt));
   const action=el('td');const stage=el('select');stage.setAttribute('aria-label','Status for '+r.name);stages.forEach(value=>stage.append(new Option(value,value)));stage.value=r.status;stage.onchange=async()=>{stage.disabled=true;try{await api('/api/records',{...r,status:stage.value});await refresh();}catch(e){$('notice').textContent=e.message;stage.value=r.status;}finally{stage.disabled=false;}};action.append(stage);const b=el('button','Notes & follow-up');b.onclick=()=>open(r);action.append(b);tr.append(person,contact,pitch,action);body.append(tr);
  }
